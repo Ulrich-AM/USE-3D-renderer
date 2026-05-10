@@ -1,3 +1,6 @@
+console.log("hello, world! testing console...");
+console.log("USE-3D RENDERER CONSOLE\nVARIABLES:\nvSize, tlSize, elSize, fov, camDist, angleX, angleY, angleZ, vCol, tCol, eCol\n\nedit animation using the following function:\n\nrenderAnim = function() {\n    clear();\n\n    ANIM HERE\n\n    renderFrame();\n    requestAnimationFrame(renderAnim);\n}");
+console.log("take note: this is a work in progress, i swear i will add an editor in the HTML instead of in the console!")
 //get canvas and context
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
@@ -12,13 +15,17 @@ ctx.translate(cw, ch);
 let vSize = 8;
 let tlSize = 3;
 let elSize = 2;
-let focalLength = 300;
+let fov = 90;
+let camDist = 300;
 let angleX = 0;
 let angleY = 0;
 let angleZ = 0;
-let vCol = "white";
-let tCol = "grey";
-let eCol = "white";
+let vCol = "#ffffff";
+let tCol = "#303030";
+let eCol = "#c6c6c6";
+let bCol = "#000000"
+//focal length
+let focalLength = canvas.width / (2 * Math.tan((fov * Math.PI) / 180 / 2));
 
 //blueprint
 let vertices = [
@@ -70,7 +77,7 @@ let edges = [
 
 //refresh screen
 function clear() {
-  ctx.fillStyle = "black";
+  ctx.fillStyle = bCol;
   ctx.fillRect(-cw, -ch, canvas.width, canvas.height);
 }
 clear();
@@ -149,10 +156,10 @@ function pv(v, i) {
 
   let r = rotatexyz(x, y, z);
 
-  r.z += 300; //move away from cam
+  r.z += camDist; //move away from cam
 
   //prevent division by 0
-  if (r.z <= 0.001) {
+  if (r.z <= 10) {
     return;
   }
 
@@ -209,12 +216,10 @@ function renderFrame() {
 
 function renderAnim() {
   clear();
-
-  angleX += 0.01;
-  angleY += 0.01;
-  angleZ += 0.01;
+  /*
+  insert animation here :)
+  */
   renderFrame();
-
   requestAnimationFrame(renderAnim);
 }
 renderAnim();
