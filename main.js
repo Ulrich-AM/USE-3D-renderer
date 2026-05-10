@@ -13,17 +13,17 @@ ctx.translate(cw, ch);
 
 //config
 let vSize = 8;
-let tlSize = 3;
+let tlSize = 1;
 let elSize = 2;
 let fov = 90;
 let camDist = 300;
 let angleX = 0;
 let angleY = 0;
 let angleZ = 0;
-let vCol = "#ffffff";
-let tCol = "#444444";
-let eCol = "#c6c6c6";
-let bCol = "#303030"
+let vCol = "#000000";
+let tCol = "#1f1f1f";
+let eCol = "#000000";
+let bCol = "#3f3f3f"
 //focal length
 let focalLength = canvas.width / (2 * Math.tan((fov * Math.PI) / 180 / 2));
 
