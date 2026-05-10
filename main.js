@@ -9,32 +9,64 @@ const ch = canvas.height / 2;
 ctx.translate(cw, ch);
 
 //config
-let vSize = 5;
+let vSize = 8;
 let tlSize = 3;
 let elSize = 2;
 let focalLength = 300;
 let angleX = 0;
 let angleY = 0;
 let angleZ = 0;
+let vCol = "white";
+let tCol = "grey";
+let eCol = "white";
 
 //blueprint
 let vertices = [
-  //first face
   [-100, -100, -100],
   [-100, 100, -100],
   [100, -100, -100],
   [100, 100, -100],
-  //second face
+
   [-100, -100, 100],
   [-100, 100, 100],
   [100, -100, 100],
   [100, 100, 100],
 ];
 let triangles = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8]
-]
+  [1, 0, 2],
+  [1, 3, 2],
+
+  [5, 4, 6],
+  [5, 7, 6],
+
+  [1, 5, 7],
+  [1, 3, 7],
+
+  [7, 6, 2],
+  [7, 3, 2],
+
+  [0, 2, 6],
+  [0, 4, 6],
+
+  [1, 0, 4],
+  [1, 5, 4],
+];
+let edges = [
+  [0, 1],
+  [1, 3],
+  [3, 2],
+  [2, 0],
+
+  [4, 5],
+  [5, 7],
+  [7, 6],
+  [6, 4],
+
+  [0, 4],
+  [1, 5],
+  [2, 6],
+  [3, 7],
+];
 
 //refresh screen
 function clear() {
@@ -45,12 +77,12 @@ clear();
 
 //draw point 2d
 function p(x, y) {
-  ctx.fillStyle = "lightgreen";
-  ctx.fillRect(x, -y, vSize, vSize);
+  ctx.fillStyle = vCol;
+  ctx.fillRect(x - vSize / 2, -y - vSize / 2, vSize, vSize);
 }
 //draw line 2d
-function l(x0, y0, x1, y1, size) {
-  ctx.strokeStyle = "lightgreen";
+function l(x0, y0, x1, y1, size, color) {
+  ctx.strokeStyle = color;
   ctx.lineWidth = size;
   ctx.beginPath();
   ctx.moveTo(x0, -y0);
@@ -110,12 +142,12 @@ function rotatexyz(x, y, z) {
 }
 
 //verts projection helper
-function pv(arr, i) {
-  let x = arr[i][0];
-  let y = arr[i][1];
-  let z = arr[i][2];
+function pv(v, i) {
+  let x = v[i][0];
+  let y = v[i][1];
+  let z = v[i][2];
 
-  let r = rotatexyz(x, y, z)
+  let r = rotatexyz(x, y, z);
 
   r.z += 300; //move away from cam
 
@@ -126,27 +158,63 @@ function pv(arr, i) {
 
   let sx = (r.x * focalLength) / r.z;
   let sy = (r.y * focalLength) / r.z;
-  p(sx, sy);
 
-  return { sx, sy };
+  return [sx, sy];
+}
+//triangles projection helper
+function pt(t, v, i) {
+  let a = t[i][0];
+  let b = t[i][1];
+  let c = t[i][2];
+
+  if (!v[a] || !v[b] || !v[c]) return; //in case i return 0 when projecting verts
+
+  //draw triangles
+  l(v[a][0], v[a][1], v[b][0], v[b][1], tlSize, tCol);
+  l(v[b][0], v[b][1], v[c][0], v[c][1], tlSize, tCol);
+  l(v[c][0], v[c][1], v[a][0], v[a][1], tlSize, tCol);
+}
+//edges projection helper
+function pe(e, v, i) {
+  let a = e[i][0];
+  let b = e[i][1];
+
+  if (!v[a] || !v[b]) return; //in case i return 0 when projecting verts
+
+  //draw edge
+  l(v[a][0], v[a][1], v[b][0], v[b][1], elSize, eCol);
 }
 
 //test
 function renderFrame() {
-  //render verts
+  //store pv for triangles and edges
+  let projected = [];
+  //store in projected
   for (let i = 0; i < vertices.length; i++) {
-    pv(vertices, i);
+    projected.push(pv(vertices, i));
+  }
+  //draw triangles
+  for (let i = 0; i < triangles.length; i++) {
+    pt(triangles, projected, i);
+  }
+  //draw edges
+  for (let i = 0; i < edges.length; i++) {
+    pe(edges, projected, i);
+  }
+  //draw vertices
+  for (let i = 0; i < projected.length; i++) {
+    p(projected[i][0], projected[i][1]);
   }
 }
 
 function renderAnim() {
-    clear();
+  clear();
 
-    angleX += 0.01;
-    angleY += 0.01;
-    angleZ += 0.01;
-    renderFrame();
+  angleX += 0.01;
+  angleY += 0.01;
+  angleZ += 0.01;
+  renderFrame();
 
-    requestAnimationFrame(renderAnim);
+  requestAnimationFrame(renderAnim);
 }
 renderAnim();
