@@ -6,13 +6,15 @@ ULRICH'S SUPER EPIC 3D RENDERER (USE-3D RENDERER):
 
 - triangles, edges, and vertices as arrays so its very simple to make new meshes
 - editable colors for background, verts, edges, and triangles
-- lots of settings
-- no user interface
-- vertices projection and wireframe rendering
+- lots of configurable stuff
+- vertices projection and wireframe (triangle/edge) rendering
 
 **to add:**
 
 - solid faces
 - shaders
 - proper user interface
-- proper render editor
+- proper render editor (current editor is in the console)
+
+**to fix:**
+- angles dont reset after changing them in console

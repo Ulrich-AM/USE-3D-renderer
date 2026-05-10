@@ -27,54 +27,6 @@ let bCol = "#000000"
 //focal length
 let focalLength = canvas.width / (2 * Math.tan((fov * Math.PI) / 180 / 2));
 
-//blueprint
-let vertices = [
-  [-100, -100, -100],
-  [-100, 100, -100],
-  [100, -100, -100],
-  [100, 100, -100],
-
-  [-100, -100, 100],
-  [-100, 100, 100],
-  [100, -100, 100],
-  [100, 100, 100],
-];
-let triangles = [
-  [1, 0, 2],
-  [1, 3, 2],
-
-  [5, 4, 6],
-  [5, 7, 6],
-
-  [1, 5, 7],
-  [1, 3, 7],
-
-  [7, 6, 2],
-  [7, 3, 2],
-
-  [0, 2, 6],
-  [0, 4, 6],
-
-  [1, 0, 4],
-  [1, 5, 4],
-];
-let edges = [
-  [0, 1],
-  [1, 3],
-  [3, 2],
-  [2, 0],
-
-  [4, 5],
-  [5, 7],
-  [7, 6],
-  [6, 4],
-
-  [0, 4],
-  [1, 5],
-  [2, 6],
-  [3, 7],
-];
-
 //refresh screen
 function clear() {
   ctx.fillStyle = bCol;
@@ -216,9 +168,9 @@ function renderFrame() {
 
 function renderAnim() {
   clear();
-  /*
-  insert animation here :)
-  */
+
+  angleY += 0.01
+
   renderFrame();
   requestAnimationFrame(renderAnim);
 }
