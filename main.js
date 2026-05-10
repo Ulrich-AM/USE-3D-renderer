@@ -21,9 +21,9 @@ let angleX = 0;
 let angleY = 0;
 let angleZ = 0;
 let vCol = "#ffffff";
-let tCol = "#303030";
+let tCol = "#444444";
 let eCol = "#c6c6c6";
-let bCol = "#000000"
+let bCol = "#303030"
 //focal length
 let focalLength = canvas.width / (2 * Math.tan((fov * Math.PI) / 180 / 2));
 
