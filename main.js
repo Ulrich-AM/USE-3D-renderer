@@ -1,6 +1,10 @@
 console.log("hello, world! testing console...");
-console.log("USE-3D RENDERER CONSOLE\nVARIABLES:\nvSize, tlSize, elSize, fov, camDist, angleX, angleY, angleZ, vCol, tCol, eCol\n\nedit animation using the following function:\n\nrenderAnim = function() {\n    clear();\n\n    ANIM HERE\n\n    renderFrame();\n    requestAnimationFrame(renderAnim);\n}");
-console.log("take note: this is a work in progress, i swear i will add an editor in the HTML instead of in the console!")
+console.log(
+  "USE-3D RENDERER CONSOLE\nVARIABLES:\nvSize, tlSize, elSize, fov, camDist, angleX, angleY, angleZ, vCol, tCol, eCol\n\nedit animation using the following function:\n\nrenderAnim = function() {\n    clear();\n\n    ANIM HERE\n\n    renderFrame();\n    requestAnimationFrame(renderAnim);\n}",
+);
+console.log(
+  "take note: this is a work in progress, i swear i will add an editor in the HTML instead of in the console!",
+);
 //get canvas and context
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
@@ -13,19 +17,31 @@ ctx.translate(cw, ch);
 
 //config
 let vSize = 8;
-let tlSize = 1;
-let elSize = 2;
+let tlSize = 2;
+let elSize = 3;
 let fov = 90;
 let camDist = 300;
 let angleX = 0;
 let angleY = 0;
 let angleZ = 0;
+/*
 let vCol = "#000000";
-let tCol = "#1f1f1f";
+let tCol = "#464646";
 let eCol = "#000000";
-let bCol = "#3f3f3f"
+let bCol = "#797979";
+*/
+let vCol = "#e0e0e0";
+let tCol = "#464646";
+let eCol = "#a5a5a5";
+let bCol = "#0c0c0c";
+/*
+let vCol = "#6b80e8";
+let tCol = "#2c407c";
+let eCol = "#505ec9";
+let bCol = "#080923";
+*/
 //focal length
-let focalLength = canvas.width / (2 * Math.tan((fov * Math.PI) / 180 / 2));
+let focalLength = canvas.width / (2 * Math.tan((fov * Math.PI) / 180 / 2)); //fov formula
 
 //refresh screen
 function clear() {
@@ -47,6 +63,17 @@ function l(x0, y0, x1, y1, size, color) {
   ctx.moveTo(x0, -y0);
   ctx.lineTo(x1, -y1);
   ctx.stroke();
+}
+//draw line 2d
+function rast(x0, y0, x1, y1, x2, y2, color) {
+  ctx.beginPath();
+  ctx.moveTo(x0, -y0);
+  ctx.lineTo(x1, -y1);
+  ctx.lineTo(x2, -y2);
+  ctx.closePath();
+
+  ctx.fillStyle = color;
+  ctx.fill();
 }
 
 //rotation functions
@@ -121,27 +148,33 @@ function pv(v, i) {
   return [sx, sy];
 }
 //triangles projection helper
-function pt(t, v, i) {
+function pt(t, vp, i) {
+  //access the vert projected positions the triangle thingy mentions
   let a = t[i][0];
   let b = t[i][1];
   let c = t[i][2];
 
-  if (!v[a] || !v[b] || !v[c]) return; //in case i return 0 when projecting verts
+  if (!vp[a] || !vp[b] || !vp[c]) return; //in case return when projecting verts
 
   //draw triangles
-  l(v[a][0], v[a][1], v[b][0], v[b][1], tlSize, tCol);
-  l(v[b][0], v[b][1], v[c][0], v[c][1], tlSize, tCol);
-  l(v[c][0], v[c][1], v[a][0], v[a][1], tlSize, tCol);
+  l(vp[a][0], vp[a][1], vp[b][0], vp[b][1], tlSize, tCol);
+  l(vp[b][0], vp[b][1], vp[c][0], vp[c][1], tlSize, tCol);
+  l(vp[c][0], vp[c][1], vp[a][0], vp[a][1], tlSize, tCol);
 }
 //edges projection helper
 function pe(e, v, i) {
   let a = e[i][0];
   let b = e[i][1];
 
-  if (!v[a] || !v[b]) return; //in case i return 0 when projecting verts
+  if (!v[a] || !v[b]) return; //in case return when projecting verts
 
   //draw edge
   l(v[a][0], v[a][1], v[b][0], v[b][1], elSize, eCol);
+}
+
+//small helper to return the position of the vertices of the triangle
+function triv(t, v, i) {
+
 }
 
 //test
@@ -154,7 +187,8 @@ function renderFrame() {
   }
   //draw triangles
   for (let i = 0; i < triangles.length; i++) {
-    pt(triangles, projected, i);
+    let t = pt(triangles, projected, i);
+    //calculate normals
   }
   //draw edges
   for (let i = 0; i < edges.length; i++) {
@@ -169,9 +203,11 @@ function renderFrame() {
 function renderAnim() {
   clear();
 
-  angleY += 0.01
+  angleY += 0.01;
+  angleX += 0.01;
+  angleZ += 0.01;
 
   renderFrame();
   requestAnimationFrame(renderAnim);
 }
-renderAnim();
+renderAnim()
