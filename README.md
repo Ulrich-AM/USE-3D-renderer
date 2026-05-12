@@ -11,10 +11,11 @@ ULRICH'S SUPER EPIC 3D RENDERER (USE-3D RENDERER):
 
 **to add:**
 
-- solid faces
+- solid faces (backface culling)
+- painters algorithm
 - shaders
 - proper user interface
 - proper render editor (current editor is in the console)
 
 **to fix:**
-- angles dont reset after changing them in console
+- angles dont reset after changing them in console editor

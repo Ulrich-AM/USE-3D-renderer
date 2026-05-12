@@ -8,17 +8,17 @@ console.log(
 //get canvas and context
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
-canvas.width = 800;
-canvas.height = 800;
+canvas.width = 350;
+canvas.height = 350;
 //setup canvas
 const cw = canvas.width / 2;
 const ch = canvas.height / 2;
 ctx.translate(cw, ch);
 
 //config
-let vSize = 8;
-let tlSize = 2;
-let elSize = 3;
+let vSize = 4;
+let tlSize = 1;
+let elSize = 2;
 let fov = 90;
 let camDist = 300;
 let angleX = 0;
@@ -33,7 +33,7 @@ let bCol = "#797979";
 let vCol = "#e0e0e0";
 let tCol = "#464646";
 let eCol = "#a5a5a5";
-let bCol = "#0c0c0c";
+let bCol = "#111111";
 /*
 let vCol = "#6b80e8";
 let tCol = "#2c407c";
