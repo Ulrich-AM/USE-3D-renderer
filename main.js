@@ -14,10 +14,11 @@ canvas.height = 350;
 const cw = canvas.width / 2;
 const ch = canvas.height / 2;
 ctx.translate(cw, ch);
+ctx.imageSmoothingEnabled = false
 
 //config
-let vSize = 4;
-let tlSize = 1;
+let vSize = 6;
+let tlSize = 3;
 let elSize = 2;
 let fov = 90;
 let camDist = 300;

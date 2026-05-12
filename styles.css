@@ -1,20 +1,24 @@
+@import url('https://fonts.cdnfonts.com/css/perfect-dos-vga-437');
+
 #mainScreen {
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  color: rgb(215, 215, 215);
+  font-family: 'Perfect DOS VGA 437', 'Times New Roman', Times, serif;
 }
 body {
   background-color: #000000;
 }
 canvas {
-  width: 800px;
-  height: 800px;
+  width: 500px;
+  height: 500px;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
 
-h1 {
-  color: rgb(215, 215, 215);
-  font-family: "Times New Roman", Times, serif;
+#bigText {
   font-size: xx-large;
+  letter-spacing: 2px;
 }
