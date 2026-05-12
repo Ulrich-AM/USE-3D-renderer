@@ -43,6 +43,7 @@ let tCol = "#2c407c";
 let eCol = "#505ec9";
 let bCol = "#080923";
 */
+
 //focal length
 const focalLength = canvas.width / (2 * Math.tan((fov * Math.PI) / 180 / 2)); //fov formula
 
@@ -131,10 +132,10 @@ function rotatexyz(x, y, z) {
 }
 
 //verts projection helper
-function pv(v, i) {
-  let x = v[i][0];
-  let y = v[i][1];
-  let z = v[i][2];
+function pv(vrt, i) {
+  let x = vrt[i][0];
+  let y = vrt[i][1];
+  let z = vrt[i][2];
 
   const r = rotatexyz(x, y, z);
 
@@ -159,59 +160,60 @@ function pv(v, i) {
   return [sx, sy];
 }
 //triangles projection helper
-function pt(t, vp, i) {
+function pt(tri, vrtproj, i) {
   //access the vert projected positions the triangle thingy mentions
-  const a = t[i][0];
-  const b = t[i][1];
-  const c = t[i][2];
+  const a = tri[i][0];
+  const b = tri[i][1];
+  const c = tri[i][2];
 
-  if (!vp[a] || !vp[b] || !vp[c]) return; //in case return when projecting verts
+  if (!vrtproj[a] || !vrtproj[b] || !vrtproj[c]) return; //in case return when projecting verts
 
   //draw triangles
-  l(vp[a][0], vp[a][1], vp[b][0], vp[b][1], tlSize, tCol);
-  l(vp[b][0], vp[b][1], vp[c][0], vp[c][1], tlSize, tCol);
-  l(vp[c][0], vp[c][1], vp[a][0], vp[a][1], tlSize, tCol);
+  l(vrtproj[a][0], vrtproj[a][1], vrtproj[b][0], vrtproj[b][1], tlSize, tCol);
+  l(vrtproj[b][0], vrtproj[b][1], vrtproj[c][0], vrtproj[c][1], tlSize, tCol);
+  l(vrtproj[c][0], vrtproj[c][1], vrtproj[a][0], vrtproj[a][1], tlSize, tCol);
 }
 //edges projection helper
-function pe(e, v, i) {
+function pe(e, vrt, i) {
   const a = e[i][0];
   const b = e[i][1];
 
-  if (!v[a] || !v[b]) return; //in case return when projecting verts
+  if (!vrt[a] || !vrt[b]) return; //in case return when projecting verts
 
   //draw edge
-  l(v[a][0], v[a][1], v[b][0], v[b][1], elSize, eCol);
+  l(vrt[a][0], vrt[a][1], vrt[b][0], vrt[b][1], elSize, eCol);
 }
 
 //small helper to return the position of the vertices of the triangle
-function triv(t, v, i) {
-  const a = t[i][0];
-  const b = t[i][1];
-  const c = t[i][2];
+function triv(tri, vrt, i) {
+  const a = tri[i][0];
+  const b = tri[i][1];
+  const c = tri[i][2];
 
   //very efficient design
   return {
-    x0: v[a][0],
-    y0: v[a][1],
-    z0: v[a][2],
+    x0: vrt[a][0],
+    y0: vrt[a][1],
+    z0: vrt[a][2],
 
-    x1: v[b][0],
-    y1: v[b][1],
-    z1: v[b][2],
+    x1: vrt[b][0],
+    y1: vrt[b][1],
+    z1: vrt[b][2],
 
-    x2: v[c][0],
-    y2: v[c][1],
-    z2: v[c][2],
+    x2: vrt[c][0],
+    y2: vrt[c][1],
+    z2: vrt[c][2],
   };
 }
 
-//thingy
+//helper for backface culling
 function dotProduct(a, b) {
   return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
 //helper for to help calculate triangle normals
 function normalize(vector) {
+  //magnitude of the vector
   const length = Math.sqrt(vector.x ** 2 + vector.y ** 2 + vector.z ** 2);
 
   //for weird triangles (degenrate)
@@ -231,18 +233,18 @@ function normalize(vector) {
   };
 }
 
-function calcNormals(t) {
+function calcNormals(tri) {
   //calculate the edges
   const e0 = {
-    x: t.x1 - t.x0,
-    y: t.y1 - t.y0,
-    z: t.z1 - t.z0,
+    x: tri.x1 - tri.x0,
+    y: tri.y1 - tri.y0,
+    z: tri.z1 - tri.z0,
   };
 
   const e1 = {
-    x: t.x2 - t.x0,
-    y: t.y2 - t.y0,
-    z: t.z2 - t.z0,
+    x: tri.x2 - tri.x0,
+    y: tri.y2 - tri.y0,
+    z: tri.z2 - tri.z0,
   };
 
   //calculate the cross product
@@ -260,6 +262,36 @@ function calcNormals(t) {
     z: tn.z,
   };
 }
+
+//backface culling
+function ifCulled(tri, vrt, i, normal) {
+  const a = tri[i][0];
+  const b = tri[i][1];
+  const c = tri[i][2];
+
+  //calculate the centroid
+  const centroid = {
+    x: (vrt[a][0] + vrt[b][0] + vrt[c][0]) / 3,
+    y: (vrt[a][1] + vrt[b][1] + vrt[c][1]) / 3,
+    z: (vrt[a][2] + vrt[b][2] + vrt[c][2]) / 3,
+  };
+  //calculate the view vector
+  const viewVector = {
+    x: camX - centroid.x,
+    y: camY - centroid.y,
+    z: camZ - centroid.z,
+  };
+  //check visibility using dot product
+  const visibility = dotProduct(normal, viewVector)
+
+  //return boolean whether to render or not
+  if (visibility > 0) {
+    return true
+  } else {
+    return false
+  }
+}
+
 //test
 function renderFrame() {
   //store pv for triangles and edges
@@ -270,7 +302,7 @@ function renderFrame() {
   }
   //draw triangles
   for (let i = 0; i < triangles.length; i++) {
-    let t = pt(triangles, projected, i);
+    let tri = pt(triangles, projected, i);
     //calculate normals
   }
   //draw edges

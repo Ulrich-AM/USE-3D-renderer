@@ -11,6 +11,7 @@ https://ulrich-am.github.io/USE-3D-renderer/
 - editable colors for background, verts, edges, and triangles
 - lots of configurable stuff
 - vertices projection and wireframe (triangle/edge) rendering
+- almost culling!!
 
 **to add:**
 
@@ -21,4 +22,5 @@ https://ulrich-am.github.io/USE-3D-renderer/
 - proper render editor (current editor is in the console)
 
 **to fix:**
+
 - angles dont reset after changing them in console editor
