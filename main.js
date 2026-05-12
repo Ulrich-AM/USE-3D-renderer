@@ -264,16 +264,14 @@ function calcNormals(tri) {
 }
 
 //backface culling
-function ifCulled(tri, vrt, i, normal) {
-  const a = tri[i][0];
-  const b = tri[i][1];
-  const c = tri[i][2];
+function ifCulled(tri) {
+  const normal = calcNormals(tri);
 
   //calculate the centroid
   const centroid = {
-    x: (vrt[a][0] + vrt[b][0] + vrt[c][0]) / 3,
-    y: (vrt[a][1] + vrt[b][1] + vrt[c][1]) / 3,
-    z: (vrt[a][2] + vrt[b][2] + vrt[c][2]) / 3,
+    x: (tri.x0 + tri.x1 + tri.x2) / 3,
+    y: (tri.y0 + tri.y1 + tri.y2) / 3,
+    z: (tri.z0 + tri.z1 + tri.z2) / 3,
   };
   //calculate the view vector
   const viewVector = {
@@ -282,13 +280,13 @@ function ifCulled(tri, vrt, i, normal) {
     z: camZ - centroid.z,
   };
   //check visibility using dot product
-  const visibility = dotProduct(normal, viewVector)
+  const visibility = dotProduct(normal, viewVector);
 
   //return boolean whether to render or not
   if (visibility > 0) {
-    return true
+    return true;
   } else {
-    return false
+    return false;
   }
 }
 
@@ -303,7 +301,6 @@ function renderFrame() {
   //draw triangles
   for (let i = 0; i < triangles.length; i++) {
     let tri = pt(triangles, projected, i);
-    //calculate normals
   }
   //draw edges
   for (let i = 0; i < edges.length; i++) {
