@@ -1,6 +1,6 @@
 console.log("hello, world! testing console...");
 console.log(
-  "USE-3D RENDERER CONSOLE\nVARIABLES:\nvSize, tlSize, elSize, fov, camZ, angleX, angleY, angleZ, vCol, tCol, eCol\n\nedit animation using the following function:\n\nrenderAnim = function() {\n    clear();\n\n    ANIM HERE\n\n    renderFrame();\n    requestAnimationFrame(renderAnim);\n}",
+  "USE-3D RENDERER CONSOLE\nVARIABLES:\nvSize, tlSize, elSize, fov, camX, camY, camZ, angleX, angleY, angleZ, vCol, tCol, eCol, bCol\n\nedit animation using the following function:\n\nrenderAnim = function() {\n    clear();\n\n    ANIM HERE\n\n    renderFrame();\n    requestAnimationFrame(renderAnim);\n}",
 );
 console.log(
   "take note: this is a work in progress, i swear i will add an editor in the HTML instead of in the console!",
@@ -22,7 +22,7 @@ let tlSize = 2;
 let elSize = 3;
 let fov = 90;
 let camX = 0;
-let camY = 50;
+let camY = 0;
 let camZ = -500;
 let angleX = 0;
 let angleY = 0;
