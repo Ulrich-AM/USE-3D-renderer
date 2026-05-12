@@ -44,7 +44,7 @@ let eCol = "#505ec9";
 let bCol = "#080923";
 */
 //focal length
-let focalLength = canvas.width / (2 * Math.tan((fov * Math.PI) / 180 / 2)); //fov formula
+const focalLength = canvas.width / (2 * Math.tan((fov * Math.PI) / 180 / 2)); //fov formula
 
 //refresh screen
 function clear() {
@@ -82,8 +82,8 @@ function rast(x0, y0, x1, y1, x2, y2, color) {
 //rotation functions
 //x
 function rotx(x, y, z, angle) {
-  let c = Math.cos(angle);
-  let s = Math.sin(angle);
+  const c = Math.cos(angle);
+  const s = Math.sin(angle);
   return {
     xp: x,
     yp: y * c - z * s,
@@ -92,8 +92,8 @@ function rotx(x, y, z, angle) {
 }
 //y
 function roty(x, y, z, angle) {
-  let c = Math.cos(angle);
-  let s = Math.sin(angle);
+  const c = Math.cos(angle);
+  const s = Math.sin(angle);
   return {
     xp: x * c + z * s,
     yp: y,
@@ -102,8 +102,8 @@ function roty(x, y, z, angle) {
 }
 //z
 function rotz(x, y, z, angle) {
-  let c = Math.cos(angle);
-  let s = Math.sin(angle);
+  const c = Math.cos(angle);
+  const s = Math.sin(angle);
   return {
     xp: x * c - y * s,
     yp: x * s + y * c,
@@ -136,7 +136,7 @@ function pv(v, i) {
   let y = v[i][1];
   let z = v[i][2];
 
-  let r = rotatexyz(x, y, z);
+  const r = rotatexyz(x, y, z);
 
   //rotate verts
   x = r.x;
@@ -153,17 +153,17 @@ function pv(v, i) {
     return;
   }
 
-  let sx = (x * focalLength) / z;
-  let sy = (y * focalLength) / z;
+  const sx = (x * focalLength) / z;
+  const sy = (y * focalLength) / z;
 
   return [sx, sy];
 }
 //triangles projection helper
 function pt(t, vp, i) {
   //access the vert projected positions the triangle thingy mentions
-  let a = t[i][0];
-  let b = t[i][1];
-  let c = t[i][2];
+  const a = t[i][0];
+  const b = t[i][1];
+  const c = t[i][2];
 
   if (!vp[a] || !vp[b] || !vp[c]) return; //in case return when projecting verts
 
@@ -174,8 +174,8 @@ function pt(t, vp, i) {
 }
 //edges projection helper
 function pe(e, v, i) {
-  let a = e[i][0];
-  let b = e[i][1];
+  const a = e[i][0];
+  const b = e[i][1];
 
   if (!v[a] || !v[b]) return; //in case return when projecting verts
 
@@ -184,8 +184,82 @@ function pe(e, v, i) {
 }
 
 //small helper to return the position of the vertices of the triangle
-function triv(t, v, i) {}
+function triv(t, v, i) {
+  const a = t[i][0];
+  const b = t[i][1];
+  const c = t[i][2];
 
+  //very efficient design
+  return {
+    x0: v[a][0],
+    y0: v[a][1],
+    z0: v[a][2],
+
+    x1: v[b][0],
+    y1: v[b][1],
+    z1: v[b][2],
+
+    x2: v[c][0],
+    y2: v[c][1],
+    z2: v[c][2],
+  };
+}
+
+//thingy
+function dotProduct(a, b) {
+  return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+//helper for to help calculate triangle normals
+function normalize(vector) {
+  const length = Math.sqrt(vector.x ** 2 + vector.y ** 2 + vector.z ** 2);
+
+  //for weird triangles (degenrate)
+  if (length === 0) {
+    return {
+      x: 0,
+      y: 0,
+      z: 0,
+    };
+  }
+
+  //return the normalized vectors
+  return {
+    x: vector.x / length,
+    y: vector.y / length,
+    z: vector.z / length,
+  };
+}
+
+function calcNormals(t) {
+  //calculate the edges
+  const e0 = {
+    x: t.x1 - t.x0,
+    y: t.y1 - t.y0,
+    z: t.z1 - t.z0,
+  };
+
+  const e1 = {
+    x: t.x2 - t.x0,
+    y: t.y2 - t.y0,
+    z: t.z2 - t.z0,
+  };
+
+  //calculate the cross product
+  const cp = {
+    x: e0.y * e1.z - e0.z * e1.y,
+    y: e0.z * e1.x - e0.x * e1.z,
+    z: e0.x * e1.y - e0.y * e1.x,
+  };
+
+  //normalize cross product
+  const tn = normalize(cp);
+  return {
+    x: tn.x,
+    y: tn.y,
+    z: tn.z,
+  };
+}
 //test
 function renderFrame() {
   //store pv for triangles and edges
