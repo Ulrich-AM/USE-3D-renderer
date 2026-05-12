@@ -1,4 +1,4 @@
-//blueprint
+//cube blueprint
 
 let vertices = [
   [-100, -100, -100],

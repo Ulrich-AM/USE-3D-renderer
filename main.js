@@ -1,6 +1,6 @@
 console.log("hello, world! testing console...");
 console.log(
-  "USE-3D RENDERER CONSOLE\nVARIABLES:\nvSize, tlSize, elSize, fov, camDist, angleX, angleY, angleZ, vCol, tCol, eCol\n\nedit animation using the following function:\n\nrenderAnim = function() {\n    clear();\n\n    ANIM HERE\n\n    renderFrame();\n    requestAnimationFrame(renderAnim);\n}",
+  "USE-3D RENDERER CONSOLE\nVARIABLES:\nvSize, tlSize, elSize, fov, camZ, angleX, angleY, angleZ, vCol, tCol, eCol\n\nedit animation using the following function:\n\nrenderAnim = function() {\n    clear();\n\n    ANIM HERE\n\n    renderFrame();\n    requestAnimationFrame(renderAnim);\n}",
 );
 console.log(
   "take note: this is a work in progress, i swear i will add an editor in the HTML instead of in the console!",
@@ -14,14 +14,16 @@ canvas.height = 350;
 const cw = canvas.width / 2;
 const ch = canvas.height / 2;
 ctx.translate(cw, ch);
-ctx.imageSmoothingEnabled = false
+ctx.imageSmoothingEnabled = false;
 
 //config
 let vSize = 6;
-let tlSize = 3;
-let elSize = 2;
+let tlSize = 2;
+let elSize = 3;
 let fov = 90;
-let camDist = 300;
+let camX = 0;
+let camY = 50;
+let camZ = -500;
 let angleX = 0;
 let angleY = 0;
 let angleZ = 0;
@@ -136,15 +138,23 @@ function pv(v, i) {
 
   let r = rotatexyz(x, y, z);
 
-  r.z += camDist; //move away from cam
+  //rotate verts
+  x = r.x;
+  y = r.y;
+  z = r.z;
+
+  //apply cam pos
+  x -= camX;
+  y -= camY;
+  z -= camZ;
 
   //prevent division by 0
-  if (r.z <= 10) {
+  if (Math.abs(z) < 0.001) {
     return;
   }
 
-  let sx = (r.x * focalLength) / r.z;
-  let sy = (r.y * focalLength) / r.z;
+  let sx = (x * focalLength) / z;
+  let sy = (y * focalLength) / z;
 
   return [sx, sy];
 }
@@ -174,9 +184,7 @@ function pe(e, v, i) {
 }
 
 //small helper to return the position of the vertices of the triangle
-function triv(t, v, i) {
-
-}
+function triv(t, v, i) {}
 
 //test
 function renderFrame() {
@@ -201,14 +209,20 @@ function renderFrame() {
   }
 }
 
+let angle = 0;
 function renderAnim() {
   clear();
 
-  angleY += 0.01;
-  angleX += 0.01;
-  angleZ += 0.01;
+  angleY += 0.03;
+
+  //circular camera motion
+  let radius = 200;
+  camX = Math.cos(angle) * radius;
+  camY = Math.sin(angle) * radius;
+  angle += 0.02;
 
   renderFrame();
   requestAnimationFrame(renderAnim);
 }
-renderAnim()
+
+renderAnim();
