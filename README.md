@@ -11,11 +11,11 @@ https://ulrich-am.github.io/USE-3D-renderer/
 - editable colors for background, verts, edges, and triangles
 - lots of configurable stuff
 - vertices projection and wireframe (triangle/edge) rendering
-- almost culling!!
+- backface culling
+- camera vector and position
 
 **to add:**
 
-- solid faces (backface culling)
 - painters algorithm
 - shaders
 - proper user interface
@@ -23,4 +23,4 @@ https://ulrich-am.github.io/USE-3D-renderer/
 
 **to fix:**
 
-- angles dont reset after changing them in console editor
+- the rasterized triangles are a bit bugged (i suppose this is due to the triangles not knowing what layer to be drawn?)

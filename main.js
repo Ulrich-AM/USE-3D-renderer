@@ -17,9 +17,9 @@ ctx.translate(cw, ch);
 ctx.imageSmoothingEnabled = false;
 
 //config
-let vSize = 6;
+let vSize = 0.001;
 let tlSize = 2;
-let elSize = 3;
+let elSize = 0.001;
 let fov = 90;
 let camX = 0;
 let camY = 0;
@@ -172,6 +172,8 @@ function pt(tri, vrtproj, i) {
   l(vrtproj[a][0], vrtproj[a][1], vrtproj[b][0], vrtproj[b][1], tlSize, tCol);
   l(vrtproj[b][0], vrtproj[b][1], vrtproj[c][0], vrtproj[c][1], tlSize, tCol);
   l(vrtproj[c][0], vrtproj[c][1], vrtproj[a][0], vrtproj[a][1], tlSize, tCol);
+
+  rast(vrtproj[a][0], vrtproj[a][1], vrtproj[b][0], vrtproj[b][1], vrtproj[c][0], vrtproj[c][1], 'white')
 }
 //edges projection helper
 function pe(e, vrt, i) {
@@ -182,28 +184,6 @@ function pe(e, vrt, i) {
 
   //draw edge
   l(vrt[a][0], vrt[a][1], vrt[b][0], vrt[b][1], elSize, eCol);
-}
-
-//small helper to return the position of the vertices of the triangle
-function triv(tri, vrt, i) {
-  const a = tri[i][0];
-  const b = tri[i][1];
-  const c = tri[i][2];
-
-  //very efficient design
-  return {
-    x0: vrt[a][0],
-    y0: vrt[a][1],
-    z0: vrt[a][2],
-
-    x1: vrt[b][0],
-    y1: vrt[b][1],
-    z1: vrt[b][2],
-
-    x2: vrt[c][0],
-    y2: vrt[c][1],
-    z2: vrt[c][2],
-  };
 }
 
 //helper for backface culling
@@ -264,7 +244,7 @@ function calcNormals(tri) {
 }
 
 //backface culling
-function ifCulled(tri) {
+function isVisible(tri) {
   const normal = calcNormals(tri);
 
   //calculate the centroid
@@ -282,12 +262,54 @@ function ifCulled(tri) {
   //check visibility using dot product
   const visibility = dotProduct(normal, viewVector);
 
-  //return boolean whether to render or not
-  if (visibility > 0) {
-    return true;
-  } else {
-    return false;
-  }
+  return {
+    doRender: visibility > 0, //if triangle is facing cam
+    dotProduct: Math.max(0, visibility), //basically how much is this triangle pointing to the viewVector
+  };
+}
+
+//decide whether this triangle should be rendered or not (just to compact things a little)
+function ifCullTri(tri, vrt, i) {
+  const a = tri[i][0];
+  const b = tri[i][1];
+  const c = tri[i][2];
+
+  //very efficient design
+  const triv = {
+    x0: vrt[a][0],
+    y0: vrt[a][1],
+    z0: vrt[a][2],
+
+    x1: vrt[b][0],
+    y1: vrt[b][1],
+    z1: vrt[b][2],
+
+    x2: vrt[c][0],
+    y2: vrt[c][1],
+    z2: vrt[c][2],
+  };
+
+  //rotated tris
+  const r0 = rotatexyz(triv.x0, triv.y0, triv.z0);
+  const r1 = rotatexyz(triv.x1, triv.y1, triv.z1);
+  const r2 = rotatexyz(triv.x2, triv.y2, triv.z2);
+
+  //apply camera stuff
+  const transTris = {
+    x0: r0.x - camX,
+    y0: r0.y - camY,
+    z0: r0.z - camZ,
+
+    x1: r1.x - camX,
+    y1: r1.y - camY,
+    z1: r1.z - camZ,
+
+    x2: r2.x - camX,
+    y2: r2.y - camY,
+    z2: r2.z - camZ,
+  };
+
+  return isVisible(transTris);
 }
 
 //test
@@ -300,7 +322,10 @@ function renderFrame() {
   }
   //draw triangles
   for (let i = 0; i < triangles.length; i++) {
-    let tri = pt(triangles, projected, i);
+    let ict = ifCullTri(triangles, vertices, i)
+    if (ict.doRender) {
+      pt(triangles, projected, i);
+    }
   }
   //draw edges
   for (let i = 0; i < edges.length; i++) {
