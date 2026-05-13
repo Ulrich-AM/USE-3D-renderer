@@ -17,9 +17,13 @@ ctx.translate(cw, ch);
 ctx.imageSmoothingEnabled = false;
 
 //import html stuff
-var xSlider = document.getElementById("xslider");
-var ySlider = document.getElementById("yslider");
-var zSlider = document.getElementById("zslider");
+var xSlider = document.getElementById("xSlide");
+var ySlider = document.getElementById("ySlide");
+var zSlider = document.getElementById("zSlide");
+
+var xCamSlider = document.getElementById("xCamSlide");
+var yCamSlider = document.getElementById("yCamSlide");
+var zCamSlider = document.getElementById("zCamSlide");
 
 //config
 let vSize = 6;
@@ -53,7 +57,7 @@ let eCol = "#505ec9";
 let bCol = "#080923";
 
 //focal length
-const focalLength = canvas.width / (2 * Math.tan((fov * Math.PI) / 180 / 2)); //fov formula
+let focalLength = canvas.width / (2 * Math.tan((fov * Math.PI) / 180 / 2)); //fov formula
 
 //refresh screen
 function clear() {
@@ -370,18 +374,21 @@ let angle = 0;
 function renderAnim() {
   clear();
 
-  /*
   angleX = Number(xSlider.value) * (Math.PI / 180);
   angleY = Number(ySlider.value) * (Math.PI / 180);
   angleZ = Number(zSlider.value) * (Math.PI / 180);
-  */
+
+  camX = Number(xCamSlider.value);
+  camY = Number(yCamSlider.value);
+  camZ = Number(zCamSlider.value);
 
   //circular camera motion
+  /*
   let radius = 200;
   camX = Math.cos(angle) * radius;
   camY = Math.sin(angle) * radius;
   angle += 0.02;
-  angleY += 0.05
+  */
 
   renderFrame();
   requestAnimationFrame(renderAnim);

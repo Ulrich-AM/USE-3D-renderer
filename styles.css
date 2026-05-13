@@ -12,13 +12,13 @@ body {
   font-family: "Perfect DOS VGA 437", "Times New Roman", Times, serif;
 }
 canvas {
-  width: 500px;
-  height: 500px;
+  width: 350px;
+  height: 350px;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
 
 #bigText {
-  font-size: xx-large;
+  font-size: x-large;
   letter-spacing: 2px;
 }
