@@ -16,10 +16,15 @@ const ch = canvas.height / 2;
 ctx.translate(cw, ch);
 ctx.imageSmoothingEnabled = false;
 
+//import html stuff
+var xSlider = document.getElementById("xslider");
+var ySlider = document.getElementById("yslider");
+var zSlider = document.getElementById("zslider");
+
 //config
-let vSize = 0.001;
-let tlSize = 2;
-let elSize = 0.001;
+let vSize = 6;
+let tlSize = 5;
+let elSize = 4;
 let fov = 90;
 let camX = 0;
 let camY = 0;
@@ -27,22 +32,25 @@ let camZ = -500;
 let angleX = 0;
 let angleY = 0;
 let angleZ = 0;
+let renderVerts = false;
+let renderTris = true;
+let renderEdges = false;
 /*
 let vCol = "#000000";
-let tCol = "#464646";
+let tCol = "#adadad";
 let eCol = "#000000";
 let bCol = "#797979";
 */
+/*
 let vCol = "#e0e0e0";
-let tCol = "#464646";
+let tCol = "#939393";
 let eCol = "#a5a5a5";
 let bCol = "#111111";
-/*
+*/
 let vCol = "#6b80e8";
 let tCol = "#2c407c";
 let eCol = "#505ec9";
 let bCol = "#080923";
-*/
 
 //focal length
 const focalLength = canvas.width / (2 * Math.tan((fov * Math.PI) / 180 / 2)); //fov formula
@@ -56,6 +64,10 @@ clear();
 
 //draw point 2d
 function p(x, y) {
+  if (!renderVerts) {
+    return;
+  }
+
   ctx.fillStyle = vCol;
   ctx.fillRect(x - vSize / 2, -y - vSize / 2, vSize, vSize);
 }
@@ -161,6 +173,10 @@ function pv(vrt, i) {
 }
 //triangles projection helper
 function pt(tri, vrtproj, i) {
+  if (!renderTris) {
+    return;
+  }
+
   //access the vert projected positions the triangle thingy mentions
   const a = tri[i][0];
   const b = tri[i][1];
@@ -173,10 +189,23 @@ function pt(tri, vrtproj, i) {
   l(vrtproj[b][0], vrtproj[b][1], vrtproj[c][0], vrtproj[c][1], tlSize, tCol);
   l(vrtproj[c][0], vrtproj[c][1], vrtproj[a][0], vrtproj[a][1], tlSize, tCol);
 
-  rast(vrtproj[a][0], vrtproj[a][1], vrtproj[b][0], vrtproj[b][1], vrtproj[c][0], vrtproj[c][1], 'white')
+  //test (subject to removal)
+  rast(
+    vrtproj[a][0],
+    vrtproj[a][1],
+    vrtproj[b][0],
+    vrtproj[b][1],
+    vrtproj[c][0],
+    vrtproj[c][1],
+    "#ffcffa",
+  );
 }
 //edges projection helper
 function pe(e, vrt, i) {
+  if (!renderEdges) {
+    return;
+  }
+
   const a = e[i][0];
   const b = e[i][1];
 
@@ -322,7 +351,7 @@ function renderFrame() {
   }
   //draw triangles
   for (let i = 0; i < triangles.length; i++) {
-    let ict = ifCullTri(triangles, vertices, i)
+    let ict = ifCullTri(triangles, vertices, i);
     if (ict.doRender) {
       pt(triangles, projected, i);
     }
@@ -341,13 +370,17 @@ let angle = 0;
 function renderAnim() {
   clear();
 
-  angleY += 0.03;
+  angleX = Number(xSlider.value) * (Math.PI / 180);
+  angleY = Number(ySlider.value) * (Math.PI / 180);
+  angleZ = Number(zSlider.value) * (Math.PI / 180);
 
+  /*
   //circular camera motion
   let radius = 200;
   camX = Math.cos(angle) * radius;
   camY = Math.sin(angle) * radius;
   angle += 0.02;
+  */
 
   renderFrame();
   requestAnimationFrame(renderAnim);

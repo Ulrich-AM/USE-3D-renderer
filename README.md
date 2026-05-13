@@ -13,6 +13,7 @@ https://ulrich-am.github.io/USE-3D-renderer/
 - vertices projection and wireframe (triangle/edge) rendering
 - backface culling
 - camera vector and position
+- added sliders
 
 **to add:**
 
