@@ -1,10 +1,3 @@
-console.log("hello, world! testing console...");
-console.log(
-  "USE-3D RENDERER CONSOLE\nVARIABLES:\nvSize, tlSize, elSize, fov, camX, camY, camZ, angleX, angleY, angleZ, vCol, tCol, eCol, bCol\n\nedit animation using the following function:\n\nrenderAnim = function() {\n    clear();\n\n    ANIM HERE\n\n    renderFrame();\n    requestAnimationFrame(renderAnim);\n}",
-);
-console.log(
-  "take note: this is a work in progress, i swear i will add an editor in the HTML instead of in the console!",
-);
 //get canvas and context
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
@@ -27,7 +20,7 @@ var zCamSlider = document.getElementById("zCamSlide");
 
 //config
 let vSize = 6;
-let tlSize = 5;
+let tlSize = 5.5;
 let elSize = 4;
 let fov = 90;
 let camX = 0;
@@ -36,25 +29,48 @@ let camZ = -500;
 let angleX = 0;
 let angleY = 0;
 let angleZ = 0;
-let renderVerts = false;
+let renderVerts = true;
 let renderTris = true;
-let renderEdges = false;
-/*
-let vCol = "#000000";
-let tCol = "#adadad";
-let eCol = "#000000";
-let bCol = "#797979";
-*/
-/*
-let vCol = "#e0e0e0";
-let tCol = "#939393";
-let eCol = "#a5a5a5";
-let bCol = "#111111";
-*/
-let vCol = "#6b80e8";
-let tCol = "#2c407c";
-let eCol = "#505ec9";
-let bCol = "#080923";
+let renderEdges = true;
+let colorPalette = 3;
+
+let vCol;
+let tCol;
+let eCol;
+let bCol;
+let rCol;
+
+if (colorPalette === 0) {
+  console.log("default palette chosen");
+  vCol = "#e0e0e0";
+  tCol = "#939393";
+  eCol = "#a5a5a5";
+  bCol = "#111111";
+  rCol = "#838383";
+} else if (colorPalette === 1) {
+  console.log("inverted palette chosen");
+  vCol = "#000000";
+  tCol = "#212121";
+  eCol = "#000000";
+  bCol = "#797979";
+  rCol = "#353535";
+} else if (colorPalette === 2) {
+  console.log("purple palette chosen");
+  vCol = "#6b80e8";
+  tCol = "#2c407c";
+  eCol = "#505ec9";
+  bCol = "#080923";
+  rCol = "#25376b";
+} else if (colorPalette === 3) {
+  console.log("debug palette chosen");
+  vCol = "#ff0000";
+  tCol = "#2f00ff";
+  eCol = "#15ff00";
+  bCol = "#000000";
+  rCol = "#ff007b";
+} else {
+  console.log("PICK A PALETTE FROM 0-3");
+}
 
 //focal length
 let focalLength = canvas.width / (2 * Math.tan((fov * Math.PI) / 180 / 2)); //fov formula
@@ -201,7 +217,7 @@ function pt(tri, vrtproj, i) {
     vrtproj[b][1],
     vrtproj[c][0],
     vrtproj[c][1],
-    "#ffcffa",
+    rCol,
   );
 }
 //edges projection helper

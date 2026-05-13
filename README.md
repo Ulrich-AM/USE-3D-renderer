@@ -5,7 +5,7 @@ ULRICH'S SUPER EPIC 3D RENDERER (USE-3D RENDERER):
 open the page:
 https://ulrich-am.github.io/USE-3D-renderer/
 
-**current features:**
+**current stuff:**
 
 - triangles, edges, and vertices as arrays so its very simple to make new meshes
 - editable colors for background, verts, edges, and triangles
@@ -43,3 +43,5 @@ x: camX - centroid.x,
 y: camY - centroid.y,
 z: camZ - centroid.z,
 };
+
+- removed crappy console editor
