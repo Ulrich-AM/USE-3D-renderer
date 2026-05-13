@@ -284,9 +284,9 @@ function isVisible(tri) {
   };
   //calculate the view vector
   const viewVector = {
-    x: camX - centroid.x,
-    y: camY - centroid.y,
-    z: camZ - centroid.z,
+    x: -centroid.x,
+    y: -centroid.y,
+    z: -centroid.z,
   };
   //check visibility using dot product
   const visibility = dotProduct(normal, viewVector);
@@ -370,17 +370,18 @@ let angle = 0;
 function renderAnim() {
   clear();
 
+  /*
   angleX = Number(xSlider.value) * (Math.PI / 180);
   angleY = Number(ySlider.value) * (Math.PI / 180);
   angleZ = Number(zSlider.value) * (Math.PI / 180);
+  */
 
-  /*
   //circular camera motion
   let radius = 200;
   camX = Math.cos(angle) * radius;
   camY = Math.sin(angle) * radius;
   angle += 0.02;
-  */
+  angleY += 0.05
 
   renderFrame();
   requestAnimationFrame(renderAnim);

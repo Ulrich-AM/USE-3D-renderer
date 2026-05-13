@@ -24,4 +24,22 @@ https://ulrich-am.github.io/USE-3D-renderer/
 
 **to fix:**
 
-- the rasterized triangles are a bit bugged (i suppose this is due to the triangles not knowing what layer to be drawn?)
+- none so far
+
+**fixed:**
+
+- the weird triangle rendering problem. i already applied the camera space to tje tris (in the transTris function) but then i do it again in the view vector. the fix was just to remove the camera position in the viewVector
+
+fixed:
+const viewVector = {
+x: -centroid.x,
+y: -centroid.y,
+z: -centroid.z,
+};
+
+original:
+const viewVector = {
+x: camX - centroid.x,
+y: camY - centroid.y,
+z: camZ - centroid.z,
+};
