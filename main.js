@@ -1,0 +1,413 @@
+//get canvas and context
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+canvas.width = 350;
+canvas.height = 350;
+//setup canvas
+const cw = canvas.width / 2;
+const ch = canvas.height / 2;
+ctx.translate(cw, ch);
+ctx.imageSmoothingEnabled = false;
+
+//import html stuff
+var xSlider = document.getElementById("xSlide");
+var ySlider = document.getElementById("ySlide");
+var zSlider = document.getElementById("zSlide");
+
+var xCamSlider = document.getElementById("xCamSlide");
+var yCamSlider = document.getElementById("yCamSlide");
+var zCamSlider = document.getElementById("zCamSlide");
+
+//config
+let vSize = 6;
+let tlSize = 5.5;
+let elSize = 4;
+let fov = 90;
+let camX = 0;
+let camY = 0;
+let camZ = -500;
+let angleX = 0;
+let angleY = 0;
+let angleZ = 0;
+let renderVerts = true;
+let renderTris = true;
+let renderEdges = true;
+let colorPalette = 3;
+
+let vCol;
+let tCol;
+let eCol;
+let bCol;
+let rCol;
+
+if (colorPalette === 0) {
+  console.log("default palette chosen");
+  vCol = "#e0e0e0";
+  tCol = "#939393";
+  eCol = "#a5a5a5";
+  bCol = "#111111";
+  rCol = "#838383";
+} else if (colorPalette === 1) {
+  console.log("inverted palette chosen");
+  vCol = "#000000";
+  tCol = "#212121";
+  eCol = "#000000";
+  bCol = "#797979";
+  rCol = "#353535";
+} else if (colorPalette === 2) {
+  console.log("purple palette chosen");
+  vCol = "#6b80e8";
+  tCol = "#2c407c";
+  eCol = "#505ec9";
+  bCol = "#080923";
+  rCol = "#25376b";
+} else if (colorPalette === 3) {
+  console.log("debug palette chosen");
+  vCol = "#ff0000";
+  tCol = "#2f00ff";
+  eCol = "#15ff00";
+  bCol = "#000000";
+  rCol = "#ff007b";
+} else {
+  console.log("PICK A PALETTE FROM 0-3");
+}
+
+//focal length
+let focalLength = canvas.width / (2 * Math.tan((fov * Math.PI) / 180 / 2)); //fov formula
+
+//refresh screen
+function clear() {
+  ctx.fillStyle = bCol;
+  ctx.fillRect(-cw, -ch, canvas.width, canvas.height);
+}
+clear();
+
+//draw point 2d
+function p(x, y) {
+  if (!renderVerts) {
+    return;
+  }
+
+  ctx.fillStyle = vCol;
+  ctx.fillRect(x - vSize / 2, -y - vSize / 2, vSize, vSize);
+}
+//draw line 2d
+function l(x0, y0, x1, y1, size, color) {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = size;
+  ctx.beginPath();
+  ctx.moveTo(x0, -y0);
+  ctx.lineTo(x1, -y1);
+  ctx.stroke();
+}
+//draw line 2d
+function rast(x0, y0, x1, y1, x2, y2, color) {
+  ctx.beginPath();
+  ctx.moveTo(x0, -y0);
+  ctx.lineTo(x1, -y1);
+  ctx.lineTo(x2, -y2);
+  ctx.closePath();
+
+  ctx.fillStyle = color;
+  ctx.fill();
+}
+
+//rotation functions
+//x
+function rotx(x, y, z, angle) {
+  const c = Math.cos(angle);
+  const s = Math.sin(angle);
+  return {
+    xp: x,
+    yp: y * c - z * s,
+    zp: y * s + z * c,
+  };
+}
+//y
+function roty(x, y, z, angle) {
+  const c = Math.cos(angle);
+  const s = Math.sin(angle);
+  return {
+    xp: x * c + z * s,
+    yp: y,
+    zp: -x * s + z * c,
+  };
+}
+//z
+function rotz(x, y, z, angle) {
+  const c = Math.cos(angle);
+  const s = Math.sin(angle);
+  return {
+    xp: x * c - y * s,
+    yp: x * s + y * c,
+    zp: z,
+  };
+}
+//rotation helper
+function rotatexyz(x, y, z) {
+  let r = rotx(x, y, z, angleX);
+  x = r.xp;
+  y = r.yp;
+  z = r.zp;
+
+  r = roty(x, y, z, angleY);
+  x = r.xp;
+  y = r.yp;
+  z = r.zp;
+
+  r = rotz(x, y, z, angleZ);
+  x = r.xp;
+  y = r.yp;
+  z = r.zp;
+
+  return { x, y, z };
+}
+
+//verts projection helper
+function pv(vrt, i) {
+  let x = vrt[i][0];
+  let y = vrt[i][1];
+  let z = vrt[i][2];
+
+  const r = rotatexyz(x, y, z);
+
+  //rotate verts
+  x = r.x;
+  y = r.y;
+  z = r.z;
+
+  //apply cam pos
+  x -= camX;
+  y -= camY;
+  z -= camZ;
+
+  //prevent division by 0
+  if (Math.abs(z) < 0.001) {
+    return;
+  }
+
+  const sx = (x * focalLength) / z;
+  const sy = (y * focalLength) / z;
+
+  return [sx, sy];
+}
+//triangles projection helper
+function pt(tri, vrtproj, i) {
+  if (!renderTris) {
+    return;
+  }
+
+  //access the vert projected positions the triangle thingy mentions
+  const a = tri[i][0];
+  const b = tri[i][1];
+  const c = tri[i][2];
+
+  if (!vrtproj[a] || !vrtproj[b] || !vrtproj[c]) return; //in case return when projecting verts
+
+  //draw triangles
+  l(vrtproj[a][0], vrtproj[a][1], vrtproj[b][0], vrtproj[b][1], tlSize, tCol);
+  l(vrtproj[b][0], vrtproj[b][1], vrtproj[c][0], vrtproj[c][1], tlSize, tCol);
+  l(vrtproj[c][0], vrtproj[c][1], vrtproj[a][0], vrtproj[a][1], tlSize, tCol);
+
+  //test (subject to removal)
+  rast(
+    vrtproj[a][0],
+    vrtproj[a][1],
+    vrtproj[b][0],
+    vrtproj[b][1],
+    vrtproj[c][0],
+    vrtproj[c][1],
+    rCol,
+  );
+}
+//edges projection helper
+function pe(e, vrt, i) {
+  if (!renderEdges) {
+    return;
+  }
+
+  const a = e[i][0];
+  const b = e[i][1];
+
+  if (!vrt[a] || !vrt[b]) return; //in case return when projecting verts
+
+  //draw edge
+  l(vrt[a][0], vrt[a][1], vrt[b][0], vrt[b][1], elSize, eCol);
+}
+
+//helper for backface culling
+function dotProduct(a, b) {
+  return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+//helper for to help calculate triangle normals
+function normalize(vector) {
+  //magnitude of the vector
+  const length = Math.sqrt(vector.x ** 2 + vector.y ** 2 + vector.z ** 2);
+
+  //for weird triangles (degenrate)
+  if (length === 0) {
+    return {
+      x: 0,
+      y: 0,
+      z: 0,
+    };
+  }
+
+  //return the normalized vectors
+  return {
+    x: vector.x / length,
+    y: vector.y / length,
+    z: vector.z / length,
+  };
+}
+
+function calcNormals(tri) {
+  //calculate the edges
+  const e0 = {
+    x: tri.x1 - tri.x0,
+    y: tri.y1 - tri.y0,
+    z: tri.z1 - tri.z0,
+  };
+
+  const e1 = {
+    x: tri.x2 - tri.x0,
+    y: tri.y2 - tri.y0,
+    z: tri.z2 - tri.z0,
+  };
+
+  //calculate the cross product
+  const cp = {
+    x: e0.y * e1.z - e0.z * e1.y,
+    y: e0.z * e1.x - e0.x * e1.z,
+    z: e0.x * e1.y - e0.y * e1.x,
+  };
+
+  //normalize cross product
+  const tn = normalize(cp);
+  return {
+    x: tn.x,
+    y: tn.y,
+    z: tn.z,
+  };
+}
+
+//backface culling
+function isVisible(tri) {
+  const normal = calcNormals(tri);
+
+  //calculate the centroid
+  const centroid = {
+    x: (tri.x0 + tri.x1 + tri.x2) / 3,
+    y: (tri.y0 + tri.y1 + tri.y2) / 3,
+    z: (tri.z0 + tri.z1 + tri.z2) / 3,
+  };
+  //calculate the view vector
+  const viewVector = {
+    x: -centroid.x,
+    y: -centroid.y,
+    z: -centroid.z,
+  };
+  //check visibility using dot product
+  const visibility = dotProduct(normal, viewVector);
+
+  return {
+    doRender: visibility > 0, //if triangle is facing cam
+    dotProduct: Math.max(0, visibility), //basically how much is this triangle pointing to the viewVector
+  };
+}
+
+//decide whether this triangle should be rendered or not (just to compact things a little)
+function ifCullTri(tri, vrt, i) {
+  const a = tri[i][0];
+  const b = tri[i][1];
+  const c = tri[i][2];
+
+  //very efficient design
+  const triv = {
+    x0: vrt[a][0],
+    y0: vrt[a][1],
+    z0: vrt[a][2],
+
+    x1: vrt[b][0],
+    y1: vrt[b][1],
+    z1: vrt[b][2],
+
+    x2: vrt[c][0],
+    y2: vrt[c][1],
+    z2: vrt[c][2],
+  };
+
+  //rotated tris
+  const r0 = rotatexyz(triv.x0, triv.y0, triv.z0);
+  const r1 = rotatexyz(triv.x1, triv.y1, triv.z1);
+  const r2 = rotatexyz(triv.x2, triv.y2, triv.z2);
+
+  //apply camera stuff
+  const transTris = {
+    x0: r0.x - camX,
+    y0: r0.y - camY,
+    z0: r0.z - camZ,
+
+    x1: r1.x - camX,
+    y1: r1.y - camY,
+    z1: r1.z - camZ,
+
+    x2: r2.x - camX,
+    y2: r2.y - camY,
+    z2: r2.z - camZ,
+  };
+
+  return isVisible(transTris);
+}
+
+//test
+function renderFrame() {
+  //store pv for triangles and edges
+  let projected = [];
+  //store in projected
+  for (let i = 0; i < vertices.length; i++) {
+    projected.push(pv(vertices, i));
+  }
+  //draw triangles
+  for (let i = 0; i < triangles.length; i++) {
+    let ict = ifCullTri(triangles, vertices, i);
+    if (ict.doRender) {
+      pt(triangles, projected, i);
+    }
+  }
+  //draw edges
+  for (let i = 0; i < edges.length; i++) {
+    pe(edges, projected, i);
+  }
+  //draw vertices
+  for (let i = 0; i < projected.length; i++) {
+    p(projected[i][0], projected[i][1]);
+  }
+}
+
+let angle = 0;
+function renderAnim() {
+  clear();
+
+  angleX = Number(xSlider.value) * (Math.PI / 180);
+  angleY = Number(ySlider.value) * (Math.PI / 180);
+  angleZ = Number(zSlider.value) * (Math.PI / 180);
+
+  camX = Number(xCamSlider.value);
+  camY = Number(yCamSlider.value);
+  camZ = Number(zCamSlider.value);
+
+  //circular camera motion
+  /*
+  let radius = 200;
+  camX = Math.cos(angle) * radius;
+  camY = Math.sin(angle) * radius;
+  angle += 0.02;
+  */
+
+  renderFrame();
+  requestAnimationFrame(renderAnim);
+}
+
+renderAnim();

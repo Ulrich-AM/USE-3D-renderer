@@ -1,0 +1,72 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>USE-3D</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="mainScreen">
+      <p id="bigText">USE-3D RENDERER</p>
+      <canvas id="canvas"></canvas>
+      <p>ULRICH'S SUPER EPIC 3D RENDERER</p>
+    </div>
+    <div>
+      <p>ROTATION</p>
+      <input
+        type="range"
+        min="0"
+        max="360"
+        value="0"
+        class="slider"
+        id="xSlide"
+      /><br />
+      <input
+        type="range"
+        min="0"
+        max="360"
+        value="0"
+        class="slider"
+        id="ySlide"
+      /><br />
+      <input
+        type="range"
+        min="0"
+        max="360"
+        value="0"
+        class="slider"
+        id="zSlide"
+      />
+      <br />
+      <br />
+
+      <p>CAM POS</p>
+      <input
+        type="range"
+        min="-500"
+        max="500"
+        value="0"
+        class="slider"
+        id="xCamSlide"
+      /><br />
+      <input
+        type="range"
+        min="-500"
+        max="500"
+        value="0"
+        class="slider"
+        id="yCamSlide"
+      /><br />
+      <input
+        type="range"
+        min="-3000"
+        max="-300"
+        value="-500"
+        class="slider"
+        id="zCamSlide"
+      />
+
+    <script src="blueprint.js"></script>
+    <script src="main.js"></script>
+  </body>
+</html>
