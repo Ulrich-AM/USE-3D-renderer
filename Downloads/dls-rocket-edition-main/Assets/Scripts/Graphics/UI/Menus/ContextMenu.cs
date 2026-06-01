@@ -80,12 +80,11 @@ namespace DLS.Graphics
 		};
 
         static readonly MenuEntry[] entries_builtinConstantChip =
-{
-            new(Format("EDIT"), OpenConstantEditMenu, CanEditCurrentChip),
-            labelChipEntry,
-            deleteEntry
+        {
+        new(Format("EDIT"), OpenConstantEditMenu, CanEditCurrentChip),
+        labelChipEntry,
+        deleteEntry
         };
-
 
 
         static readonly MenuEntry[] entries_subChipOutput = pinColEntries;
@@ -196,9 +195,9 @@ namespace DLS.Graphics
 							else if (subChip.ChipType == ChipType.DisplayLED) activeContextMenuEntries = entries_builtinLED;
 							else if (subChip.ChipType == ChipType.Button) activeContextMenuEntries = entries_builtinButton;
 							else if (subChip.ChipType == ChipType.Constant_8Bit) activeContextMenuEntries = entries_builtinConstantChip;
+		
 
-							else activeContextMenuEntries = entries_builtinSubchip;
-						}
+							else activeContextMenuEntries = entries_builtinSubchip;						}
 
 						Project.ActiveProject.controller.Select(interactionContext as IMoveable, false);
 					}

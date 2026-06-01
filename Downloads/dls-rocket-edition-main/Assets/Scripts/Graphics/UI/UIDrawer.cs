@@ -25,10 +25,9 @@ namespace DLS.Graphics
 			CollectionStats,
 			ProjectStats,
 			PulseEdit,
-            ConstantEdit,
-            UnsavedChanges,
-			Search,
-			ChipLabelPopup,
+			ConstantEdit,
+			UnsavedChanges,
+			Search,			ChipLabelPopup,
 			SpecialChipMaker,
 			ProjectTools
 		}
@@ -88,6 +87,7 @@ namespace DLS.Graphics
 			else if (menuToDraw == MenuType.PinRename) PinEditMenu.DrawMenu();
 			else if (menuToDraw == MenuType.RebindKeyChip) RebindKeyChipMenu.DrawMenu();
 			else if (menuToDraw == MenuType.RomEdit) RomEditMenu.DrawMenu();
+			else if (menuToDraw == MenuType.PulseEdit) PulseEditMenu.DrawMenu();
 			else if (menuToDraw == MenuType.ChipStats) ChipStatsMenu.DrawMenu(); 
 			else if (menuToDraw == MenuType.CollectionStats) CollectionStatsMenu.DrawMenu();
 			else if (menuToDraw == MenuType.ProjectStats) ProjectStatsMenu.DrawMenu();

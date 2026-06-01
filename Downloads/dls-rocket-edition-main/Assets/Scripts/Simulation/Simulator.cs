@@ -38,7 +38,7 @@ namespace DLS.Simulation
 		static double elapsedSecondsOld;
 		static double deltaTime;
 		static SimAudio audioState;
-
+		
 		// Modifications to the sim are made from the main thread, but only applied on the sim thread to avoid conflicts
 		static readonly ConcurrentQueue<SimModifyCommand> modificationQueue = new();
 
